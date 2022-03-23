@@ -1,0 +1,152 @@
+---
+title: "ECON 620"
+author: "Brooke Johnson"
+date: "2/11/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem Set 1
+
+### 1. Suppose that you are asked to conduct a study to determine whether smaller class sizes lead to improved student performance of fourth graders. 
+a. If you could conduct any experiment you want, what would you do? Be specific.
+
+If I could conduct any experiment I would want observational data on class performance metrics including test scores, participation rates, attendance and homework scores for fourth graders in schools across the country with additional data points around demographic variables like family income, distance from home to school, and other things that could affect performance other than class size. That level of detail collected on so many observations is unrealistic. A good starting point would be analyzing test scores of students in a single state. Ideally, this could be run as an event study using the school test score performance before changing class sizes to act as a counter factual, and match up schools that are similar in performance to pair them off where once can receive the treatment and the other will be a control. This will give a decent perspective on the impact of changing class sizes. Again, coordinating such a wide-scale administrative change would be very difficult and could cause so much disruption that our results would be unnecessarily noisy. 
+
+b.More realistically, suppose you can collect observational data on several thousand fourth-graders in a given state. You can obtain the size of their fourth-grade class and a standardized test score taken at the end of fourth grade. Why might you expect a negative correlation between class size and test scores?
+
+We might anticipate that when class sizes are small, the per/student share of class resources increases resulting in better learning. Therefore, as class size decreases, scores increase. They are negatively correlated because they move in opposite directions (so we suspect).
+
+c. Would a negative correlation necessarily show that smaller class sizes cause better performance? Explain. 
+
+No, correlation does not show causation, it just shows how the variables move in relative to each other. Without knowing more about how the analysis is run, there are plenty of backdoor variables that could affect our treatment or outcome variables such that our results could be biased. 
+
+### 2. States (and provinces) that have control over taxation sometimes reduce taxes in an attempt to spur economic growth. Suppose that you are hired by a state to estimate the effect of corporate tax rates on, say, the growth in per capita gross state product (GSP).
+
+a. What kind of data would you need to collect to undertake a statistical analysis?
+
+I would need panel data on taxes paid by corporations, wages of employees, total goods and services output (probably measures by financial earnings of the companies), domestic investment levels, and maybe consumer spending data. 
+
+b. Is it feasible to do a controlled experiment? What would be required?
+
+To have a controlled experiment you would need two groups of corporations that are, by most accounts, the same - have similar profits, company size, same pre-experiment tax laws, etc. Then you'd have to "treat" one of the two groups with a new set of laws and compare the results to the control group (ideally). For this reason, federal changes in corporate tax won't serve as a good experiment. But state changes in corporate tax could work. Ideally there would be two states next to each other with similar economic conditions where one state can be the control and the other will be the treatment. This will create a regression discontinuity analysis. 
+
+c. Is a correlation analysis between GSP growth and tax rates likely to be convincing? Explain. 
+
+ Using a regression discontinuity as I described should produce convincing correlation between GSP and tax rates because all the other variables could be accounted for provided that the setup accounts for them in the first place. If the two neighboring states are too different to start with then it would not be a convincing result. The control group has to be a solid counter factual for the treatment in order to believe any correlation. 
+
+### 3. Use the data in Wage1 (found in Canvas week 2 module) for this exercise.
+```{r}
+wage_data <- read.csv("../ECON 620 Econometrics/wage1_S2022.csv", stringsAsFactors = TRUE)
+```
+a. Find the average education level in the sample. What are the lowest and highest years of education?
+```{r}
+mean(wage_data$educ, na.rm=TRUE)
+min(wage_data$educ, na.rm=TRUE)
+max(wage_data$educ, na.rm=TRUE)
+```
+b. Find the average hourly wage in the sample. Does it seem high or low?
+```{r}
+mean(wage_data$ï..wage)
+# $5.89/hr seems very low
+```
+c. The wage data are reported in 1976 dollars. Using the internet or printed source, find the Consumer Price Index (CPI) for the years 1976 and 2018.
+```{r}
+# CPI for 1976 = 56.9
+# CPI for 2018 = 251.1
+```
+d. Use the CPI values from Part c. to find the average hourly wage in 2018 dollars. Now does the average hourly wage seem more reasonable? Explain.
+```{r}
+avg_hrly_wage_2018 = mean(wage_data$ï..wage) * (251.1/56.9)
+avg_hrly_wage_2018
+# This hourly wage looks more reasonable now that it is adjusted for inflation. Using the CPI to adjust the value of the average hourly wage we get a result that accounts for the purchasing power of each dollar through the change in prices of basic goods
+```
+e. How many women are in the sample? how many men?
+```{r}
+sum(wage_data$female, na.rm=TRUE)
+sum(!wage_data$female, na.rm=TRUE)
+```
+### 4. Let *kids* denote the number of children born to a woman, and let *educ* denote years of education for the woman. A simple model relating fertility to years of education is: $ kids = b_0 + b_1 educ + u $  where u is the unobserved error.
+
+a. What kinds of factors are contained in *u*? Are these likely to be correlated with level of education?
+
+There are so many possible factors that could be contained in U, but in summary is will contain any factor that has an effect on the number of kids a woman gives birth to other than her education level. It could be health factors, such as ability to bear children, amount of time until menopause, weight, underlying health concerns, etc. It could be economic factors like income, retirement savings, taxes, access to public education, access to affordable food, etc. It could be legal such as abortion or contraception laws where the woman is located. It could be social, like religious identity, community expectations, desire to have kids, etc. Many of these factors could be expected to be correlated with level of education as well. For example, health conditions that impair a woman's ability to bear a child could also impair her ability to attend school. Another might be, low wages correlating with fewer children, and correlating with less education. 
+
+b. Will a simple regression analysis uncover the ceteris paribus (all else held equal) effect of education on fertility? Explain.
+
+No, there are too many variables that could be affecting the treatment and outcome variable that aren't accounted for in this model. Because the error term is likely to have some correlation with the treatment variable we will not be able to confidently claim ceteris paribus. 
+
+c. What are some potential techniques that researchers can use to alleviate the issues explained in part a?
+
+If the variables in the error term that are causing the problem are measurable then the research can parse them out and include them in the model to account for their affect. For example, an interaction term between wage and education would account for the effect that wage has on education level and the affect that wage has on number of children. 
+Instrumental Variables (IV) could also help in reducing the bias caught up in the error term by isolating only the covariance between the treatment and outcome by randomizing who is receiving the treatment. 
+
+### 5. The following table contains the ACT scores and the GPA for eight college students. GPA is based on a 4-point scale and has been rounded to one digit after the decimal. 
+
+a. Estimate the relationship between GPA and ACT using OLS; that is, obtain the intercept and slope estimates for the equation
+```{r}
+Student <- c(1, 2, 3, 4, 5, 6, 7, 8)
+GPA <- c(2.8, 3.4, 3.0, 3.5, 3.6, 3.0, 2.7, 3.7)
+ACT <- c(21, 24, 26, 27, 29, 25, 25, 30)
+student_data <- data.frame(Student, GPA, ACT)
+student_data
+
+plot(student_data$ACT, student_data$GPA)
+abline(lm(GPA ~ ACT, data = student_data))
+
+regression1 <- lm(GPA ~ ACT, data = student_data)
+regression1
+```
+$ \widehat{GPA_i} = 0.5681 + 0.1022*ACT_i + \hat{\epsilon_i} $
+The relationship here is positive, so an increase in ACT scores is associated with an increase in college GPAs. The intercept isn't really useful to interpret. It essentially predicts the college GPA if the ACT score is 0. Logically we might assume that someone who scored a 0 on the ACT isn't attending college, maybe. 
+A 5 point increase in ACT is associated with a
+```{r}
+answer <- 0.5681+0.1022*5
+answer
+```
+increase in college GPA.
+b. Compute the fitted values and residual for each observation, and verify that the residuals (approximately) sum to zero. 
+```{r}
+# fitted values: 
+fit1 <- fitted(regression1)
+fit1
+
+#residuals:
+resid(regression1)
+
+#residuasls sum to approximately zero:
+sum(resid(regression1))
+```
+c. What is the predicted value of GPA when ACT=20?
+```{r}
+answer2 <- 0.5681+0.1022*20
+answer2
+```
+### 6. Derive the OLS slope estimate for the case when a regression model does not contain a constant or intercept term. Show all work. 
+
+
+
+### 7. We have discussed multiple different types of data in class (quantitative, qualitative, survey, cross-sectional, pooled, etc.)
+
+a. Which types of data do you believe are MOST difficult for researchers to collect? Why?
+
+Qualitative data and cross-sectional data are probably the most difficult to collect. Qualitative data because it could consist of a different qualitative measure for every observation in the data set. It could contain a high amount of variety, be inconsistent and/or be very subjective to the observation's experience. While it can be very helpful to paint a picture and convey meaning or significance of other measure or of results, collecting the data itself could be very time consuming and difficult to measure because of the nature of the possible answers. 
+
+Cross-sectional would be hard to collect because you have to have consistent measure of all the participating observations across time. There are so many things that can happen in life that would affect something/someone's ability  to continue participating, either voluntarily joining an experiment or agreeing to have data collected on them. There could even be other logistical problems that come up that interfere with data collection like natural disaster, political instability, etc. 
+
+b. How can bias be introduced into data analysis results if data is collected in an irresponsible manner?
+
+Bias would enter by misrepresenting the variables used in the analysis or by coinciding specifically with variables that are not used in the analysis. The former would be taking imbalanced measures of a variable, only counting measure of it that fit within some pre-conceived notion of what the variable range should be, or selecting what measure of the variable to record based on other factors that each observation has (like excluding groups of people based on some exterior observation). The latter would be, like that last point, selecting observations to measure based on exterior factors. This creates backdoors that can cause correlation between the error term and the treatment variable because its not otherwise captures in the model. 
+
+c.Give an example of how bias may be introduced into a research project based on the manner of how the data was collected
+
+If a researcher wanted to determine medical issues related to air pollution have increased in the US over the last 20 years but they only sample data from cities next to high-polluting industries (like towns built around coal mining), they would introduce a lot of bias into their model. The geographic location and proximity to local polluting industries would have a strong affect on medical issues related to air pollution but it is not included in the researchers question and is not directly accounted for in the model. If the question was looking at the medical affects of rising air pollution in towns near high-polluters then the backdoor affect would be accounted for. But as an analysis of nation-wide results it would be very biased. 
+
+d. What practices should a researcher implement to ensure that results from data analysis are reliable?
+
+Researchers should first consider their question at hand and thoroughly consider all variables that could impact their results. To the best of their ability they should collect full data on relevant variables, and maintain consistent measurement practices for collecting the data. The data set should be cleaned so to be aware of any missing values, units of measurement, and areas of correlation between variables. Full scale EDA will help the researcher understand visually how their variables connect before developing their model. This information can help inform the type of analysis they should use to account for all the relevant effects on their outcome variable without leaving bias through backdoors. Its most important not to let preconceived notions of what the expected outcome should be impact the data collection process or the scope of the data. Being unbiased and thorough are important for creating a reliable analysis.  
+
+

@@ -1,0 +1,177 @@
+---
+title: "Econ 620 - Midterm"
+author: "Brooke Johnson"
+date: "3/22/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Loading the datasets:
+```{r}
+df_wine <- read.csv("../ECON 620 Econometrics/wine_components.csv", stringsAsFactors = TRUE)
+df_wage <- read.csv("../ECON 620 Econometrics/wage1_S2022.csv", stringsAsFactors = TRUE)
+df_sleep <- read.csv("../ECON 620 Econometrics/sleep75A.csv", stringsAsFactors = TRUE)
+```
+
+### Question 1
+```{r}
+regression1 <- lm(df_wage$ï..wage ~ df_wage$educ + df_wage$exper + df_wage$tenure)
+summary(regression1)
+```
+
+### Question 1.a
+Interpret the estimates for the slope coefficients:
+
+Coefficient estimate on educ (education) is 0.59897, meaning that if we increase the amount of education for a person by one unit it is associated with a 0.59897 increase in their wage or approxiately a $0.60 increase. 
+
+Coefficient estimate on exper (experience) is 0.02234, meaning that if we increase the amount of experience a person has by one unit it is associated with a 0.02234 incease in their wage or approximately a $0.02 increase. 
+
+Coefficient estimate on tenure is 0.16927, meaning that if we increase the amount of tenure a person has by one unit it is associated with a 0.16927 increase in their wage or approximately a $0.17 increase. 
+
+### Question 1.b
+What are the P-values for the variables? What do they represent?
+
+P-value for education: <2e-16 (very very small number)
+P-value for experience: 0.0645 (small number)
+P-value for tenure: 2.93e-14 (very very small number)
+
+These numbers represent the significance level of our variables and helps us decide whether they are statistically significant or not. In the scope of running an experiment, this will tell us if we can accept or reject the null hypothesis and help us determine if our coefficients are significant estimates of the population coeffcients. 
+
+### Question 1.c
+Perform a 5% t-test for the variable tenure. Explain weither to use a one sided or two-sided test. 
+$H_0: \beta_3 = 0$ 
+$H_a: \beta_3 \not= 0$ 
+
+Since p-value = 2.93e-14 < significance level 0.05 we can reject the null hypothesis. 
+The star and point insignia next to the p-values also help us identify their decision. Since a '.' would indicate significant results at the 5% level per the legend, and our p-value blows that out of the water indicating significance at the 0% range, we can conclude that the results are statistically significant. 
+
+A two-tailed test here is appropriate since we do not know for certain the direction of the relationship between tenure and wage. I suppose someone with enough research in the matter would have enough of the background theory to know if the relationship is almost certainly positive or almost certainly negative, in which case they can perform a one-tailed test to identify if there is a statistically significant positive or statistically significant negative relationship. But since I don't know that with the information given it makes most sense to test if there is a relationship in either direction or not. 
+
+### Question 2.a
+Which variables in the wine dataset are quantitative and which are qualitative?
+```{r}
+summary(df_wine)
+```
+
+All of the variables are quantitative, except "wine_type" which is qualitative. Judging from the summary we can see the variables are all represented numerically since they are presented with summary statistics, except for wine_type which seems to be categorical between reds, whites and roses. 
+
+### Question 2.b
+What is the average malic_acid level of wines included in this data set?
+```{r}
+mean(df_wine$malic_acid)
+```
+
+### Question 2.c
+What is the minimum value of total_phenols and what is the maximum value of total_phenols?
+```{r}
+min(df_wine$total_phenols)
+max(df_wine$total_phenols)
+```
+
+### Question 2.d
+Show a histogram for the alcalinity_of_ash variable. What type of distribution does it seem to have?
+```{r}
+hist(df_wine$alcalinity_of_ash)
+```
+
+The distribution is almost normal, with a very slight skew to the left. It would be more normal if the bin from 10-12 were less than the bin from 12-14, but it otherwise is somewhat symmetrical. 
+
+### Question 3
+```{r}
+age <- c(7, 6, 8, 6, 5)
+height <- c(42, 40, 53, 46, 37)
+df_height <- data.frame(age, height)
+```
+
+### Question 3.a
+Given the following regression function
+$Height = \beta_0 + \beta_1Age + u$
+Use R to find the estimators $\hat{\beta_0}$ and $\hat{\beta_1}$
+```{r}
+regression2 <- lm(df_height$height ~ df_height$age)
+summary(regression2)
+```
+
+$\hat{\beta_0} = 14.308$ 
+$\hat{\beta_1} = 4.577$
+
+### Question 3.b
+Interpret the values:
+
+The intercept tells us that when age is zero, the individual's expected height in inches is 14.308. This is non-sensical because an individual arguably, theoretically, cannot be zero. I suppose if someone were making an estimate of the height of an unborn baby then that's what we're seeing here. 
+
+The slope tells us that each year of life is associated with a 4.577 inch growth for a person. 
+
+### Question 3.c
+What is the $R^2$ for this model? What does it tell us?
+
+The $R^2 = 0.711$ which tells us that 0.711 or 71.1% of the variation in height is explained by age. As a measure of good fit for our model, this score is relatively high, meaning that our model is a decent approximation of the underlying population. 
+
+### Question 3.d
+Conduct a t-test to determine if age is a statistically significant determinant of height. 
+
+Conducting a two-tailed t-test at the 99% confidence level. 
+$H_0: \beta_1 = 0$ 
+$H_a: \beta_1 \not= 0$
+
+I think two-sided makes sense here since age could have a positive or negative affect on height. When a person is young, their height should increase with age, but at a certain point in old age that relationship generally reverses. 
+
+Using the P-value in the regression output: 
+P-value = 0.0727 > 0.01 significance level we fail to reject the null hypothesis, and conclude that our coefficient is not statistically significant. 
+
+### Question 3.e
+Conduct a 95% confidence interval for the variable age. Interpret the value of this confidence interval. 
+
+```{r}
+upper_bound <- 4.577 + 2.776 * 3.841
+# used t-stat table to look up t-critical value for two-tailed test at 95% confidence level
+upper_bound
+
+lower_bound <- 4.577 - 2.776 * 3.841
+lower_bound
+```
+
+Confidence interval: [-6.085616, 15.23962]
+
+We are 95% confident that our coefficient is within the range of the confidence interval since we failed to reject the null hypothesis in step d. 
+
+### Question 4.a 
+Create a graph from the height dataset with age on the x-axis and height on the y-axis
+```{r}
+plot(df_height$age, df_height$height)
+```
+
+### Question 4.b
+On the graph from part a, add a regression line. 
+```{r}
+plot(df_height$age, df_height$height)
+abline(lm(df_height$height ~ df_height$age))
+```
+
+Yes, it is consistent with the results, it looks like the intercept is in the range of ~14 and it shows a positive relationship close to a ~5 unit increase in height for every unit increase in age. It is, however, different from my expectation that this function would best be represented as a parabola, althrough a parabolic line would not fit this dataset. 
+
+### Question 4.c
+Calculate the SSR, SST & SSE
+```{r}
+ssr <- sum((df_height$height - fitted(regression2))^2)
+sse <- sum((mean(df_height$height) - fitted(regression2))^2)
+sst <- ssr+sse
+```
+
+### Question 5.a 
+Provide a histogram for the variable exper.
+```{r}
+hist(df_sleep$exper)
+```
+
+### Question 5.b 
+What characteristics ar required for a variable to have a normal distribution?
+
+To be normally distributed, a variable will exhibit a bell-shaped curve in a histogram, meaning that it will have the highest frequency distribution in the center and will be symmetrical on either side. The center of the distribution will be around the population mean. Our outcome variable, height, is predictable and determined by the mean and variance. 
+
+### Question 5.c
+Do you believe that this variable is normally distributed? 
+
+No, this does not look like a normal distribution. It does not look evenly distributed around the mean, and it has a significant skew to the left. 

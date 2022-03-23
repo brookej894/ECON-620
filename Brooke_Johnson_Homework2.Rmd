@@ -1,0 +1,203 @@
+---
+title: "ECON 620 - Spring 2022"
+author: "Brooke Johnson"
+date: "3/2/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 2
+```{r}
+df_401k <- read.csv("../ECON 620 Econometrics/401k.csv", stringsAsFactors = TRUE)
+```
+### 2a.
+```{r}
+mean(df_401k$mrate)
+mean(df_401k$prate)
+```
+### 2b.
+```{r}
+regression1 <- lm(df_401k$prate ~ df_401k$mrate)
+summary(regression1)
+```
+coefficient: 5.861, intercept: 83.0755, sample size: 1533 (degrees of freedom + 1), R^2: 0.0747
+
+$$
+ParticipationRate = 83.0755 + 5.861 * MatchRate + u
+$$
+
+### 2c.
+When the match rate (or generosity of the plan) is zero, 83% of employees are predicted to participate in having an active account.
+
+An increase in the match rate of $1 is associated with a 5.86% increase in the plan participation rate. 
+
+### 2d.
+```{r]}
+prate <- 83.0755 + 5.861*3.5
+prate
+```
+The predicted precent of enrolled workers is 104%, this prediction therefore does not make sense since it estimates more than the available number of works. 
+
+Since the regression model is a line that has not been given parameters of the independent variable for which to estimate, it will provide estimations beyond reasonable interpretation (i.e. predict an estimate over 100%)
+
+### 2e.
+The $R^2$ is: 
+```{r}
+summary(lm(df_401k$prate ~ df_401k$mrate))$r.squared
+```
+.07 or 7% of the variation in particpation rate is explained by the match rate. This is not a great model because it only explains a very low amount of variation in our variable of interest. 
+
+### 3
+```{r}
+df_sleep <- read.csv("../ECON 620 Econometrics/sleep75A.csv", stringsAsFactors = TRUE)
+```
+### 3a.
+```{r}
+regression2 <- lm(df_sleep$sleep ~ df_sleep$totwrk)
+summary(regression2)
+```
+### 3b.
+coefficient: -0.15075, intercept:3586.37695, sample size: 705, R^2: 0.1033
+$$ TimeSleeping = 3586 - 0.15075*TimeWorking + u $$
+
+The intercept tells us that when total time spent in paid work is zero the expected amount of sleep measured in minutes is 3,586 minutes (or 58 hours)
+
+In this instance, the intercept does not tell us something helpful, since its impossible to spend 58 hours a night sleeping. 
+This is a limitation in interpreting the model. 
+
+### 3c.
+```{r}
+change_in_sleep <- 120*(-0.15075)
+change_in_sleep
+```
+If total amount of work increases by 2 hours we would predict a decrease of 18.09 minutes in amount of time sleeping. 
+This is not a very large affect, trading 18.09 sleeping minutes for 120 working minutes. 
+
+### 3d. 
+```{r}
+sse <- sum((df_sleep$sleep - fitted(regression2))^2)
+ssr <- sum((mean(df_sleep$sleep) - fitted(regression2))^2)
+sst <- ssr+sse
+
+r_squared <- (ssr/sst)
+r_squared
+
+ser <- sqrt(sse/704)
+ser
+```
+### 3e. 
+There is a strong likelihood that SRL.3 will be violated, indicating that the error term is correlated with the independent variable. Said differently, the $e(u|x) \not=  0$
+
+The reason why its likely to be violated is that the model is only accounting for a single independent variable, where in reality there are probably many more variables that should be included. By leaving them out, their affect is captured in the error term causing it to be correlated with the variable in the model 
+
+### 4
+```{r}
+regression3 <- lm(df_sleep$sleep ~ df_sleep$totwrk + df_sleep$Educ + df_sleep$age)
+summary(regression3)
+```
+### 4a. 
+When adults trade off sleep for work the coefficient on $\beta_1$ is negative, meaning that if they sleep less they will work more, or work less and sleep more. 
+The relationship between the outcome variable and $x_1$ is negative. 
+
+### 4b. 
+One could reasonably assume that the relationship between education and sleep is also negative, such that a decrease in time spent in education should result in an increase in sleep, and vice versa.
+
+The sign on age could difficult to guess, one hand young people require more hours sleeping to maintain health brain activity but often actually acheive less hours of sleep due to life style choices and environmental factors. 
+
+I would use the background assumption that people require more sleep at a younger age to estimate that the relationship between age and sleep will be negative such that as one ages the amount of sleep they acheive decreases. 
+
+Therefore the coefficients on age and education ($\beta_2$ & $\beta_3$) should be negative. 
+
+### 4c. 
+If someone works 5 hours more (or 300 minutes), we would predict that their amount of sleep would fall by ...
+```{r}
+change_in_sleep_2 <- 300*(-.14779)
+change_in_sleep_2
+```
+ ... 44.337 minutes or .739 hours. This is not too large of a trade off, 300 working minutes for 44 sleeping minutes. 
+
+### 4d. 
+The negative sign on the coefficient for education makes sense because of the explanation given in 4b - that is time spent in education is less time sleeping. 
+
+The magnitude is much larger than hours working through, suggesting there is a bigger cost of sleep for education than work. 1 hour decrease in the amount of time in education will result in a 658.2 (10.79*60) minute increase in amount of time sleeping. 
+
+### 4e. 
+The R-squared in this model = 0.1138 or 11.38%, meaning that 11% of the variation in sleep is explained by observing these three variables in our model. 
+
+This result has a lot of room for improvement. 11% explained variation is not much. There is likely still variation in hours spent sleeping being accumulated in the error term, meaning that we are missing significant variables that predict amount of time sleeping. 
+
+Examples of possible missing variables include whether the individual has a  young kid, whether they are married, time spent doing leisure activities, etc. 
+
+These variables could be correlated with total working hours. For example, if an individual has a young child they may have to spend less time working into order to care for their kid like leaving work early to pick them up from school. 
+
+Any variable that infringes on the amount of hours an individual has available to sleep will also risk coinciding with an affect on work since total available hours could be allocated to either activity. 
+
+### 5
+See attachment at the end of the document. 
+
+### 6
+SLR.1: the parameters of the model ($\beta_1$ ...$\beta_k$) are linear, meaning that the out come variable is linearly predicted using these parameters. 
+SLR.2: the outcome variable and the independent variable are independently and identically distributed, caused by the observations being randomly sampled. 
+SLR.3: zero conditional mean, also said as the expected value of the error term conditional on the independent variable is 0 indicating there is no covariance or correlation between the independent variable and error term. 
+$E(u|x) = 0$
+SLR.4: the independent variable is not constant across observations. With no variation in the independent variable, x, the calculation used to estimate the coefficient $\beta_1$ would be undefined because the difference between the observation and the mean for the variable would = 0 in the denominator of the calculation. 
+$\hat{\beta_1} = (\sum_{i = 1}^{n} (x_i - \bar{x})(y_i - \bar{y}))/(\sum_{i = 1}^{n} (x_i - \bar{x})^2$
+
+SLR.5: Homoskedasticity - the variance of the error term conditional on x is constant.$var(u|x) = \sigma^2$  
+
+### 6a.
+SLR.3 is most likely to be violated in a real research project project because it is difficult to account for enough variables in a model to avoid having the error term be related to the independent variable. 
+
+### 6b.
+for multiple linear regression the assumptions are adapted to account for all the independent variables included in the model. 
+SLR.1 -> MLR.1: no change, parameters should all be linear
+SLR.2 -> MLR.2: the outcome variable and all independent variables are independently and identically distributed through random sampling.
+SLR.3 -> MLR.3 (changes): No perfect linear relationships among any combinations of x variables. This ensures there are no duplicated x variables.
+SLR.4 -> MLR.4 (essentially the same): all of the x variables are uncorrelated with the error term.
+$E(u|x_1 ... x_k) = 0$
+SLR.5 -> MLR.5: Homoskedasticity
+
+### 6c.
+An example of a multiple linear regression model with OVB:
+Trying to predict income (y) using the variable education (x) but not accounting for geographic location. In this example, we can expect that geographic location will affect the income someone would receive since some areas pay higher salaries to match the cost of living than other areas. This affect will be captured in the error term and cause the error term to be correlated with the y variable of interest. 
+
+### 6d.
+An example of an extraneous variable in a MLR:
+Trying to measure the affect of education on ability to complete annual taxes, where the extraneous variable is someone's natural math skills. In this example, the natural proclivity toward math might impact someone's ability to complete their taxes due to their natural characteristics outside of the independent variable of education level. 
+
+### 6e.
+An example of multicolinearity in a MLR:
+Trying to predict house size of individuals using their income level and tax bracket. In this example the two independent variables, income level and tax bracket, are correlated with each other because the tax bracket is determined by income level. 
+
+### 7
+For my thesis I am researching: to what extent do firms follow metabolic scaling relationships from macroecology between organismic metabolism and abundance? Can we observe the emergent collective behavior of firms operating at different levels of complexity as metabolically distinct processes?
+
+### 7a.
+I don't have specific sources or parameters in mind yet for data, but I anticipate using secondhand data of eukaryote life cycle and metabolism details combined with city and firm level details on operations. The extent of the economics type data will need to include measurements of firm size including financial information on performance, and physical employee count, square footage of office space, and resource/utility usage. 
+
+The data generating process (DGP) is built off of the power scaling laws observed in biological sciences and growing research exhibiting their applicability to economic settings. The typical model for power scaling looks something like $y = cm^k$ where $k$ or $\beta$ is the coefficient of interest to predict how certain variables predict growth in a super/sub-linear fashion. There is also a distinction between allometric and isometric scaling if the coefficient is equal to or different from 1. The application to the economic setting in my research will be building off past research I've studied showing that a component based analysis of the firm, and categorization of firm types or industries into a mission-based framework can shed help view the scaling coefficient of what can be considered "firm metabolism" and its affect on industry and city growth. 
+
+### 7b.
+Challenges will come from the process of grouping firms into the framework described (mission-based groups and component-based analysis). Finding mathematical/scientific justification for saying that parts of a firm are analogous to parts of the natural world could be challenging. There's no reason why a man made organism will inherently follow physiological similarities to evolution's plants and animals. Being able to establish this connection though will be the bases for the entire comparison and lead to future research on the matter. 
+
+### 7c.
+A tentative list would be: firm type, industry, expenses, revenue, stock market value, employee count, square footage of office space, daily operational hours, utility usage, amount paid on utilities, type of energy used (solar, wind, etc), output of product or service, rate of inputs used, date business started, years of operation 
+All of this would be helpful to have over all calendar years since the firm began business. 
+
+I would potentially, be interested in having data around innovations that firms are using in their business operations or in any endevours that change their growth rate. Previous research has strongly emphasized the economic impact of innovation on power scaling of growth and its affects on sustainability. But based on the diversity of the firms and industries accounted for it could be challenging to identify what counts as an innovation or not. 
+
+### 7d.
+The most important of the qualitative variables is the firm type and industry. Previous research has shown that these two variables cause city growth to scale allometrically, in some cases super-linearly and in some case sub-linearly. 
+
+### 7e.
+Because my research of interest is concern a non-linear relationship I am going to describe a function that is a multiple linear regression with some of the measurements I've described instead. 
+$$ growth = \beta_0 + \beta_1 * utility_consumption + \beta_2 * profit + \beta_3 * employee_count + \beta_4 * daily_hours_operation + u $$
+
+This equation can theoretically be simplified down to describe the causal affects I'm most interested in: 
+$$ growth = \beta_0 + \beta_1 * firm_metabolic_rate + \beta_2 * innovation +u $$
+
+
+
